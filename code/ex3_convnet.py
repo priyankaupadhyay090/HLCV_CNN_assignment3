@@ -5,7 +5,7 @@ import torchvision
 import torchvision.transforms as transforms
 import numpy as np
 import matplotlib.pyplot as plt
-
+from tqdm import tqdm, trange
 
 def weights_init(m):
     if type(m) == nn.Linear:
@@ -262,7 +262,7 @@ PrintModelSize(model)
 # Visualize the filters before training
 # ======================================================================================
 VisualizeFilter(model)
-sys.exit(0)
+# sys.exit(0)
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -271,8 +271,9 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=
 # Train the model
 lr = learning_rate
 total_step = len(train_loader)
-for epoch in range(num_epochs):
-    for i, (images, labels) in enumerate(train_loader):
+best_validation_acc = 0.0  # this is added for Q2.B early stopping
+for epoch in trange(num_epochs, desc="training epoch"):
+    for i, (images, labels) in enumerate(tqdm(train_loader, desc="training batch")):
         # Move tensors to the configured device
         images = images.to(device)
         labels = labels.to(device)
@@ -298,7 +299,7 @@ for epoch in range(num_epochs):
     with torch.no_grad():
         correct = 0
         total = 0
-        for images, labels in val_loader:
+        for images, labels in tqdm(val_loader, desc="validating"):
             images = images.to(device)
             labels = labels.to(device)
             outputs = model(images)
@@ -313,7 +314,12 @@ for epoch in range(num_epochs):
         #################################################################################
         best_model = None
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        current_epoch_val_acc = correct / total
+        if current_epoch_val_acc > best_validation_acc:
+            best_validation_acc = current_epoch_val_acc
+            best_model = model
+            torch.save(best_model.state_dict(), f'{num_epochs}_early_stopping_model.pt')
+            print(f'Saving model with best validation accuracy so-far...\n')
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     model.train()
@@ -326,12 +332,13 @@ model.eval()
 # best model so far and perform testing with this model.                        #
 #################################################################################
 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+torch.save(model.state_dict(), f'after_training_{num_epochs}epochs_model.pt')  # saving the model state dict w/o early stopping
+model.load_state_dict(torch.load(f'{num_epochs}_early_stopping_model.pt'))  # loading the early stopping state dict
 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 with torch.no_grad():
     correct = 0
     total = 0
-    for images, labels in test_loader:
+    for images, labels in tqdm(test_loader, desc="testing"):
         images = images.to(device)
         labels = labels.to(device)
         outputs = model(images)

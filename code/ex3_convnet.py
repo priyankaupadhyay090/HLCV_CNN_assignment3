@@ -118,6 +118,10 @@ class ConvNet(nn.Module):
                                     kernel_size=3,
                                     stride=1,
                                     padding=1))
+
+            if norm_layer is not None:
+                layers.append(nn.BatchNorm2d(h_size))
+
             # after aech maxpool, filter size dimension is halved
             layers.append(nn.MaxPool2d(kernel_size=2,
                                        stride=2))
@@ -198,7 +202,7 @@ def PrintModelSize(model, disp=True):
 # Calculate the model size (Q1.c)
 # visualize the convolution filters of the first convolution layer of the input model
 # -------------------------------------------------
-def VisualizeFilter(model):
+def VisualizeFilter(model, before=True):
     #################################################################################
     # TODO: Implement the functiont to visualize the weights in the first conv layer#
     # in the model. Visualize them as a single image fo stacked filters.            #
@@ -217,7 +221,10 @@ def VisualizeFilter(model):
 
     # permute visualized_filters to be: HxWxC for matplotlib
     plt.imshow(visualized_filters.permute(1, 2, 0))
-    plt.savefig("plt_visualized_filters.png", dpi=90)
+    filename = "plt_visualized_filters.png"
+    if before:
+        filename = f"before_{filename}"
+    plt.savefig(filename, dpi=90)
     plt.show()
 
     # if no need to show grid, can simply save visulized vilters directly with
@@ -234,8 +241,13 @@ def VisualizeFilter(model):
 # In this question we will implement a convolutional neural networks using the PyTorch
 # library.  Please complete the code for the ConvNet class evaluating the model
 # --------------------------------------------------------------------------------------
+# for Q2.a, uncomment the line 243 below
+# norm_layer = True
 model = ConvNet(input_size, hidden_size, num_classes, norm_layer=norm_layer).to(device)
 # Q2.a - Initialize the model with correct batch norm layer
+# for Q2.a -- each conv layer batch norm will take the previous conv layer out_channels as argument
+# which is turned-on if norm_layer is not None
+
 
 model.apply(weights_init)
 # Print the model
@@ -332,7 +344,7 @@ with torch.no_grad():
     print('Accuracy of the network on the {} test images: {} %'.format(total, 100 * correct / total))
 
 # Q1.c: Implementing the function to visualize the filters in the first conv layers.
-# Visualize the filters before training
-VisualizeFilter(model)
+# Visualize the filters before training <-- isn't the call below for AFTER training at this point?
+VisualizeFilter(model, False)
 # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')

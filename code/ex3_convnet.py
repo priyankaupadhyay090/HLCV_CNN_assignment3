@@ -1,3 +1,4 @@
+import sys
 import torch
 import torch.nn as nn
 import torchvision
@@ -182,8 +183,13 @@ def PrintModelSize(model, disp=True):
     # training                                                                      #
     #################################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    if disp:
+        for name, param in model.named_parameters():
+            if param.requires_grad:
+                print(f'{name}, {param.shape}, # params: {param.numel()}, {param}\n')
 
-    model_sz = None
+    model_sz = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f'Total # params: {model_sz}\n')
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     return model_sz
 
@@ -193,13 +199,31 @@ def PrintModelSize(model, disp=True):
 # visualize the convolution filters of the first convolution layer of the input model
 # -------------------------------------------------
 def VisualizeFilter(model):
-    pass
     #################################################################################
     # TODO: Implement the functiont to visualize the weights in the first conv layer#
     # in the model. Visualize them as a single image fo stacked filters.            #
     # You can use matlplotlib.imshow to visualize an image in python                #
     #################################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    # conv_net[0] is the first convolution layer
+    # shape: [128,3,3,3]  representing BxCxHxW
+    # where B = batch, number of filters in this case, C = channels, HxW kernel or filter size
+    conv1_weights = model.conv_net[0].weight.detach().clone()
+    print(f"conv_net[0].weight shape: {conv1_weights.size()}")
+
+    # make_grid takes BxCxHxW, normalize=True to adjust values of Tensor to be between (0,1)
+    # ncol x nrow grid of images where each image tensor is of shape: CxHxW
+    visualized_filters = torchvision.utils.make_grid(conv1_weights, nrow=16, normalize=True)
+
+    # permute visualized_filters to be: HxWxC for matplotlib
+    plt.imshow(visualized_filters.permute(1, 2, 0))
+    plt.savefig("plt_visualized_filters.png", dpi=90)
+    plt.show()
+
+    # if no need to show grid, can simply save visulized vilters directly with
+    # torchvision.utils.save_image as below:
+    # torchvision.utils.save_image(conv1_weights, fp="visualized_filters.png", nrow=16, normalize=True)
+
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -226,6 +250,7 @@ PrintModelSize(model)
 # Visualize the filters before training
 # ======================================================================================
 VisualizeFilter(model)
+sys.exit(0)
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()

@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm, trange
 
+
 def weights_init(m):
     if type(m) == nn.Linear:
         m.weight.data.normal_(0.0, 1e-3)
@@ -59,7 +60,10 @@ print(hidden_size)
 #################################################################################
 data_aug_transforms = []
 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+data_aug_transforms.extend([transforms.RandomHorizontalFlip(),
+                            transforms.RandomRotation(10),
+                            transforms.RandomAffine(degrees=0, shear=10, scale=(0.8, 1.2)),
+                            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2)])
 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 norm_transform = transforms.Compose(data_aug_transforms + [transforms.ToTensor(),
                                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))

@@ -27,6 +27,16 @@ print('Using device: %s' % device)
 # --------------------------------
 # Hyper-parameters
 # --------------------------------
+try:
+    norm_layer = sys.argv[1]
+except IndexError:
+    norm_layer = None
+
+try:
+    drop_out = float(sys.argv[2])
+except IndexError:
+    drop_out = None
+
 input_size = 3
 num_classes = 10
 hidden_size = [128, 512, 512, 512, 512, 512]
@@ -37,7 +47,7 @@ learning_rate_decay = 0.95
 reg = 0.001
 num_training = 49000
 num_validation = 1000
-norm_layer = None
+# norm_layer = None
 print(hidden_size)
 
 # -------------------------------------------------
@@ -95,7 +105,7 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
 # Set norm_layer for different networks whether using batch normalization
 # -------------------------------------------------
 class ConvNet(nn.Module):
-    def __init__(self, input_size, hidden_layers, num_classes, norm_layer=None):
+    def __init__(self, input_size, hidden_layers, num_classes, norm_layer=None, drop_out=drop_out):
         super(ConvNet, self).__init__()
         #################################################################################
         # TODO: Initialize the modules required to implement the convolutional layer    #
@@ -126,6 +136,9 @@ class ConvNet(nn.Module):
             layers.append(nn.MaxPool2d(kernel_size=2,
                                        stride=2))
             layers.append(nn.ReLU())
+
+            if drop_out is not None:
+                layers.append(nn.Dropout(p=drop_out))
 
             # update the input_size for the next conv block to be == to the out_channels of the previous conv block
             self.input_size = h_size
@@ -241,12 +254,10 @@ def VisualizeFilter(model, before=True):
 # In this question we will implement a convolutional neural networks using the PyTorch
 # library.  Please complete the code for the ConvNet class evaluating the model
 # --------------------------------------------------------------------------------------
-# for Q2.a, uncomment the line 243 below
-# norm_layer = True
 model = ConvNet(input_size, hidden_size, num_classes, norm_layer=norm_layer).to(device)
 # Q2.a - Initialize the model with correct batch norm layer
 # for Q2.a -- each conv layer batch norm will take the previous conv layer out_channels as argument
-# which is turned-on if norm_layer is not None
+# which is turned-on if norm_layer is not None (via command line argv[1])
 
 
 model.apply(weights_init)
@@ -262,7 +273,6 @@ PrintModelSize(model)
 # Visualize the filters before training
 # ======================================================================================
 VisualizeFilter(model)
-# sys.exit(0)
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()

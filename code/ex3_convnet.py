@@ -7,6 +7,7 @@ import torchvision.transforms as transforms
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm, trange
+from pathlib import Path
 
 
 def weights_init(m):
@@ -235,6 +236,7 @@ def VisualizeFilter(model, before=True, plt_show=args.disp):
     # You can use matlplotlib.imshow to visualize an image in python                #
     #################################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    output_dir = Path(__file__).resolve().parent / 'output'
     # conv_net[0] is the first convolution layer
     # shape: [128,3,3,3]  representing BxCxHxW
     # where B = batch, number of filters in this case, C = channels, HxW kernel or filter size
@@ -251,6 +253,7 @@ def VisualizeFilter(model, before=True, plt_show=args.disp):
     filename = "plt_visualized_filters.png"
     if before:
         filename = f"before_{filename}"
+    filename = output_dir / filename
     plt.savefig(filename, dpi=90)
     if plt_show:
         plt.show()

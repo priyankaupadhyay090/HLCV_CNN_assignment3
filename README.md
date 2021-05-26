@@ -1,5 +1,12 @@
 # HLCV_CNN_assignment3
 
+## Requirements
+
+For experiment logging and configuration tracking in Weights & Biases, please install the library:
+`pip install wandb` in addition to the other libraries pre-imported in the assignment.
+
+
+
 ## Notes
 
 1. Q1.C, **VisualFilter(model)** function is modified to accept an additional _boolean_ argument: before.
@@ -11,11 +18,14 @@
    The parameter for ``nn.BatchNorm2d`` is the out_channel parameter of the previous ``nn.conv2d`` layer, i.e. 
    the value of ``h_size``.
    
-3. Q3.B, To specify dropout value: type a value between [0.1,0.9] on the command line:  
-``python ex3_convnet.py -d 0.5``
-   
 3. Q3.A, To specify how many transform methods to add to compose function for data augmentation, specify int
 values between [0,4]; 0 deselects all methods.
+
+4. Q3.B, To specify dropout value: type a value between [0.1,0.9] on the command line:  
+   ``python ex3_convnet.py -d 0.5``
+   
+5. For keeping track of the various experiments and hyperparameter configurations, we logged the evaluation metrics and
+standard outputs in Weights & Biases (W & B), which can be examined [here](https://wandb.ai/pokarats/HLCV_CNN_3).
    
    
 ## Configure Command Line Arguments for Experiments

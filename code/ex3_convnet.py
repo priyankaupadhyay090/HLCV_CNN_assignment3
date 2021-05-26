@@ -33,13 +33,13 @@ print('Using device: %s' % device)
 # --------------------------------
 parser = argparse.ArgumentParser(description='ex3 convnet param options')
 parser.add_argument('-e', '--epoch', type=int, default=20, help='Number of epochs')
-parser.add_argument('-n', '--norm', type=bool, default=False, help='Turn on Batch Normalization')
+parser.add_argument('-n', '--norm', type=bool, default=True, help='Turn on Batch Normalization')
 parser.add_argument('-d', '--dropout', type=float, default=None, help='Specify dropout p-value')
 parser.add_argument('-j', '--jitter', type=float, default=0.2, help='Specify ColorJitter param')
 parser.add_argument('-a', '--augment', type=int, default=0, help='How many data augmentation techniques to add to '
                                                                  'compose')
 parser.add_argument('-v', '--disp', type=bool, default=False, help='Show plots to display')
-parser.add_argument('-s', '--e_stop', type=bool, default=False, help='Apply early stop')
+parser.add_argument('-s', '--e_stop', type=bool, default=True, help='Apply early stop')
 parser.add_argument('-c', '--comment', type=str, default="q1_3", help='Run comment')
 
 args = parser.parse_args()

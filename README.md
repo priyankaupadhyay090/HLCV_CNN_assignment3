@@ -24,7 +24,7 @@ To configure hyperparameter values for experiments, specify options below
 
 ```
 usage: ex3_convnet.py [-h] [-e EPOCH] [-n NORM] [-d DROPOUT] [-j JITTER]
-[-a AUGMENT] [-v DISP] [-s E_STOP]
+[-a AUGMENT] [-v DISP] [-s E_STOP] [-c COMMENT]
 
 ex3 convnet param options
 
@@ -39,5 +39,6 @@ optional arguments:
 compose e.g. values between [1-4], 4 uses all transform techniques
 -v DISP, --disp DISP  Show plots to display [default = False; plots are saved without display]
 -s E_STOP, --e_stop E_STOP Apply early stop [default = False]
+-c COMMENT, --comment Run comment for wandb run name [default = "q1_3"]
 ```
    

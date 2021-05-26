@@ -1,3 +1,4 @@
+import argparse
 import sys
 import torch
 import torch.nn as nn
@@ -28,20 +29,27 @@ print('Using device: %s' % device)
 # --------------------------------
 # Hyper-parameters
 # --------------------------------
-try:
-    norm_layer = sys.argv[1]
-except IndexError:
-    norm_layer = None
+parser = argparse.ArgumentParser(description='ex3 convnet param options')
+parser.add_argument('-e', '--epoch', type=int, default=20, help='Number of epochs')
+parser.add_argument('-n', '--norm', type=bool, default=False, help='Turn on Batch Normalization')
+parser.add_argument('-d', '--dropout', type=float, default=None, help='Specify dropout p-value')
+parser.add_argument('-j', '--jitter', type=float, default=0.2, help='Specify ColorJitter param')
+parser.add_argument('-a', '--augment', type=int, default=4, help='How many data augmentation techniques to add to '
+                                                                 'compose')
+parser.add_argument('-v', '--disp', type=bool, default=False, help='Show plots to display')
 
-try:
-    drop_out = float(sys.argv[2])
-except IndexError:
-    drop_out = None
+args = parser.parse_args()
+
+# get hyperparameters from cl for experiments
+norm_layer = args.norm
+drop_out = args.dropout
+
+print(args)
 
 input_size = 3
 num_classes = 10
 hidden_size = [128, 512, 512, 512, 512, 512]
-num_epochs = 20
+num_epochs = args.epoch  # default is 20, changeable via cl
 batch_size = 200
 learning_rate = 2e-3
 learning_rate_decay = 0.95
@@ -63,9 +71,9 @@ data_aug_transforms = []
 data_aug_transforms.extend([transforms.RandomHorizontalFlip(),
                             transforms.RandomRotation(10),
                             transforms.RandomAffine(degrees=0, shear=10, scale=(0.8, 1.2)),
-                            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2)])
+                            transforms.ColorJitter(brightness=args.jitter, contrast=args.jitter, saturation=args.jitter)])
 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-norm_transform = transforms.Compose(data_aug_transforms + [transforms.ToTensor(),
+norm_transform = transforms.Compose(data_aug_transforms[:args.augment] + [transforms.ToTensor(),
                                                            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                                            ])
 test_transform = transforms.Compose([transforms.ToTensor(),
@@ -133,7 +141,7 @@ class ConvNet(nn.Module):
                                     stride=1,
                                     padding=1))
 
-            if norm_layer is not None:
+            if norm_layer:
                 layers.append(nn.BatchNorm2d(h_size))
 
             # after aech maxpool, filter size dimension is halved
@@ -219,7 +227,7 @@ def PrintModelSize(model, disp=True):
 # Calculate the model size (Q1.c)
 # visualize the convolution filters of the first convolution layer of the input model
 # -------------------------------------------------
-def VisualizeFilter(model, before=True):
+def VisualizeFilter(model, before=True, plt_show=args.disp):
     #################################################################################
     # TODO: Implement the functiont to visualize the weights in the first conv layer#
     # in the model. Visualize them as a single image fo stacked filters.            #
@@ -242,7 +250,8 @@ def VisualizeFilter(model, before=True):
     if before:
         filename = f"before_{filename}"
     plt.savefig(filename, dpi=90)
-    plt.show()
+    if plt_show:
+        plt.show()
 
     # if no need to show grid, can simply save visulized vilters directly with
     # torchvision.utils.save_image as below:

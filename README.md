@@ -15,7 +15,7 @@
 ``python ex3_convnet.py -d 0.5``
    
 3. Q3.A, To specify how many transform methods to add to compose function for data augmentation, specify int
-values between [1,4]
+values between [0,4]; 0 deselects all methods.
    
    
 ## Configure Command Line Arguments for Experiments

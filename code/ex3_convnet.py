@@ -34,7 +34,7 @@ parser.add_argument('-e', '--epoch', type=int, default=20, help='Number of epoch
 parser.add_argument('-n', '--norm', type=bool, default=False, help='Turn on Batch Normalization')
 parser.add_argument('-d', '--dropout', type=float, default=None, help='Specify dropout p-value')
 parser.add_argument('-j', '--jitter', type=float, default=0.2, help='Specify ColorJitter param')
-parser.add_argument('-a', '--augment', type=int, default=4, help='How many data augmentation techniques to add to '
+parser.add_argument('-a', '--augment', type=int, default=0, help='How many data augmentation techniques to add to '
                                                                  'compose')
 parser.add_argument('-v', '--disp', type=bool, default=False, help='Show plots to display')
 
@@ -44,7 +44,7 @@ args = parser.parse_args()
 norm_layer = args.norm
 drop_out = args.dropout
 
-print(args)
+print(f'CL-Arguments: {args}')
 
 input_size = 3
 num_classes = 10
@@ -57,7 +57,7 @@ reg = 0.001
 num_training = 49000
 num_validation = 1000
 # norm_layer = None
-print(hidden_size)
+print(f'hidden sizes: {hidden_size}')
 
 # -------------------------------------------------
 # Load the CIFAR-10 dataset
@@ -286,6 +286,7 @@ PrintModelSize(model)
 # Visualize the filters before training
 # ======================================================================================
 VisualizeFilter(model)
+
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()

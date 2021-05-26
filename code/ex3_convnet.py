@@ -238,7 +238,6 @@ def VisualizeFilter(model, before=True, plt_show=args.disp):
     # shape: [128,3,3,3]  representing BxCxHxW
     # where B = batch, number of filters in this case, C = channels, HxW kernel or filter size
     conv1_weights = model.conv_net[0].weight.detach().clone()
-    conv1_weights.cpu()
     print(f"conv_net[0].weight shape: {conv1_weights.size()}")
 
     # make_grid takes BxCxHxW, normalize=True to adjust values of Tensor to be between (0,1)
@@ -246,6 +245,7 @@ def VisualizeFilter(model, before=True, plt_show=args.disp):
     visualized_filters = torchvision.utils.make_grid(conv1_weights, nrow=16, normalize=True)
 
     # permute visualized_filters to be: HxWxC for matplotlib
+    visualized_filters.cpu()
     plt.imshow(visualized_filters.permute(1, 2, 0))
     filename = "plt_visualized_filters.png"
     if before:

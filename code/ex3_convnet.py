@@ -37,6 +37,7 @@ parser.add_argument('-j', '--jitter', type=float, default=0.2, help='Specify Col
 parser.add_argument('-a', '--augment', type=int, default=0, help='How many data augmentation techniques to add to '
                                                                  'compose')
 parser.add_argument('-v', '--disp', type=bool, default=False, help='Show plots to display')
+parser.add_argument('-s', '--e_stop', type=bool, default=False, help='Apply early stop')
 
 args = parser.parse_args()
 
@@ -339,12 +340,13 @@ for epoch in trange(num_epochs, desc="training epoch"):
         #################################################################################
         best_model = None
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        current_epoch_val_acc = correct / total
-        if current_epoch_val_acc > best_validation_acc:
-            best_validation_acc = current_epoch_val_acc
-            best_model = model
-            torch.save(best_model.state_dict(), f'{num_epochs}_early_stopping_model.pt')
-            print(f'Saving model with best validation accuracy so-far...\n')
+        if args.e_stop:
+            current_epoch_val_acc = correct / total
+            if current_epoch_val_acc > best_validation_acc:
+                best_validation_acc = current_epoch_val_acc
+                best_model = model
+                torch.save(best_model.state_dict(), f'{num_epochs}_early_stopping_model.pt')
+                print(f'Saving model with best validation accuracy so-far...\n')
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     model.train()
@@ -357,8 +359,10 @@ model.eval()
 # best model so far and perform testing with this model.                        #
 #################################################################################
 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-torch.save(model.state_dict(), f'after_training_{num_epochs}epochs_model.pt')  # saving the model state dict w/o early stopping
-model.load_state_dict(torch.load(f'{num_epochs}_early_stopping_model.pt'))  # loading the early stopping state dict
+if args.e_stop:
+    torch.save(model.state_dict(), f'after_training_{num_epochs}epochs_model.pt')  # saving the model state dict w/o early stopping
+    print(f'Best Validataion accuracy is: {100 * best_validation_acc}')
+    model.load_state_dict(torch.load(f'{num_epochs}_early_stopping_model.pt'))  # loading the early stopping state dict
 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 with torch.no_grad():
     correct = 0

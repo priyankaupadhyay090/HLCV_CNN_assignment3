@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm, trange
 from pathlib import Path
+import wandb
 
 
 def weights_init(m):
@@ -39,6 +40,7 @@ parser.add_argument('-a', '--augment', type=int, default=0, help='How many data 
                                                                  'compose')
 parser.add_argument('-v', '--disp', type=bool, default=False, help='Show plots to display')
 parser.add_argument('-s', '--e_stop', type=bool, default=False, help='Apply early stop')
+parser.add_argument('-c', '--comment', type=str, default="q1_3", help='Run comment')
 
 args = parser.parse_args()
 
@@ -60,6 +62,17 @@ num_training = 49000
 num_validation = 1000
 # norm_layer = None
 print(f'hidden sizes: {hidden_size}')
+
+# update hyperparameters wandb is tracking
+# set up wandb for hyperparameters logging and tuning
+wandb.init(project="HLCV_CNN_3", name=args.comment)
+
+wandb.config.epochs = args.epoch
+wandb.config.dropout = 0 if args.dropout is None else args.dropout
+wandb.config.jitter = args.jitter
+wandb.config.norm_layer = "BatchNorm" if args.norm_layer else "w/o BatchNorm"
+wandb.config.data_augment = args.augment
+wandb.config.early_stop = "early stopping" if args.e_stop else "w/o early stopping"
 
 # -------------------------------------------------
 # Load the CIFAR-10 dataset
@@ -297,6 +310,9 @@ VisualizeFilter(model)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=reg)
 
+# log the network weight histograms (optional) in wandb
+wandb.watch(model)
+
 # Train the model
 lr = learning_rate
 total_step = len(train_loader)
@@ -350,6 +366,13 @@ for epoch in trange(num_epochs, desc="training epoch"):
                 best_model = model
                 torch.save(best_model.state_dict(), f'{num_epochs}_early_stopping_model.pt')
                 print(f'Saving model with best validation accuracy so-far...\n')
+
+    # Log the loss and accuracy values at the end of each epoch
+    val_accuracy = 100 * correct / total
+    wandb.log({
+        "Epoch": epoch,
+        "Train Loss": loss.item(),
+        "Valid Acc": val_accuracy})
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     model.train()
@@ -381,6 +404,8 @@ with torch.no_grad():
             break
 
     print('Accuracy of the network on the {} test images: {} %'.format(total, 100 * correct / total))
+    test_accuracy = 100 * correct / total
+    wandb.run.summary["best_accuracy"] = test_accuracy
 
 # Q1.c: Implementing the function to visualize the filters in the first conv layers.
 # Visualize the filters before training <-- isn't the call below for AFTER training at this point?

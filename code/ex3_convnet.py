@@ -70,7 +70,7 @@ wandb.init(project="HLCV_CNN_3", name=args.comment)
 wandb.config.epochs = args.epoch
 wandb.config.dropout = 0 if args.dropout is None else args.dropout
 wandb.config.jitter = args.jitter
-wandb.config.norm_layer = "BatchNorm" if args.norm_layer else "w/o BatchNorm"
+wandb.config.norm_layer = "BatchNorm" if args.norm else "w/o BatchNorm"
 wandb.config.data_augment = args.augment
 wandb.config.early_stop = "early stopping" if args.e_stop else "w/o early stopping"
 

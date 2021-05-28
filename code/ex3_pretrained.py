@@ -34,6 +34,8 @@ print('Using device: %s' % device)
 parser = argparse.ArgumentParser(description='ex3 convnet param options')
 parser.add_argument('-e', '--epoch', type=int, default=30, help='Number of epochs')
 parser.add_argument('-s', '--e_stop', type=bool, default=True, help='Apply early stop')
+parser.add_argument('-f', '--fine_tune', type=bool, default=True, help='Fine-tune ONLY')
+parser.add_argument('-p', '--load_pretrained', type=bool, default=True, help='Load pre-trained weight')
 parser.add_argument('-c', '--comment', type=str, default="q4a", help='Run comment')
 
 args = parser.parse_args()
@@ -51,8 +53,8 @@ learning_rate_decay = 0.99
 reg = 0  # 0.001
 num_training = 49000
 num_validation = 1000
-fine_tune = True
-pretrained = True
+fine_tune = args.fine_tune
+pretrained = args.load_pretrained
 
 print(f'layer_config: {layer_config}')
 # update hyperparameters wandb is tracking
@@ -65,7 +67,8 @@ wandb.config.jitter = 0
 wandb.config.norm_layer = "BatchNorm"
 wandb.config.data_augment = 1
 wandb.config.early_stop = "early stopping" if args.e_stop else "w/o early stopping"
-
+wandb.config.fine_tune = "classifier only" if fine_tune else "all params"
+wandb.config.pretrained = "use pretrained weights" if pretrained else "trained from scratch"
 
 data_aug_transforms = [transforms.RandomHorizontalFlip(p=0.5)]  # , transforms.RandomGrayscale(p=0.05)]
 

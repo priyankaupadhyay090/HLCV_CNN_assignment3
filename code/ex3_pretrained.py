@@ -191,6 +191,9 @@ model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(params_to_update, lr=learning_rate, weight_decay=reg)
 
+# log the network weight histograms (optional) in wandb
+wandb.watch(model)
+
 # Train the model
 lr = learning_rate
 total_step = len(train_loader)
@@ -203,7 +206,6 @@ for epoch in trange(num_epochs, desc="training epoch"):
         labels = labels.to(device)
 
         # Forward pass
-        print(f"image size: {images.size()}")
         outputs = model(images)
         loss = criterion(outputs, labels)
 

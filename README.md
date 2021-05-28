@@ -30,7 +30,7 @@ standard outputs in Weights & Biases (W & B), which can be examined [here](https
    
 ## Configure Command Line Arguments for Experiments
 
-To configure hyperparameter values for experiments, specify options below
+To configure hyperparameter values for Q1-3 experiments, specify options below
 
 ```
 usage: ex3_convnet.py [-h] [-e EPOCH] [-n NORM] [-d DROPOUT] [-j JITTER]
@@ -52,3 +52,20 @@ compose e.g. values between [1-4], 4 uses all transform techniques
 -c COMMENT, --comment Run comment for wandb run name [default = "q1_3"]
 ```
    
+For Q4, see options below:
+
+```
+usage: ex3_pretrained.py [-h] [-e EPOCH] [-s E_STOP] [-f FINE_TUNE]
+                         [-p LOAD_PRETRAINED] [-c COMMENT]
+
+ex3 convnet param options
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -e EPOCH, --epoch EPOCH Number of epochs [default = 30]
+  -s E_STOP, --e_stop E_STOP Apply early stop [default = True]
+  -f FINE_TUNE, --fine_tune FINE_TUNE Fine-tune ONLY [default = True], False to update all parameters
+  -p LOAD_PRETRAINED, --load_pretrained LOAD_PRETRAINED Load pre-trained weight [default = True]
+  -c COMMENT, --comment COMMENT Run comment [default = 'q4a']
+
+```

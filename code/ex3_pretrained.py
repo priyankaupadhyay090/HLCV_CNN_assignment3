@@ -34,7 +34,7 @@ print('Using device: %s' % device)
 parser = argparse.ArgumentParser(description='ex3 convnet param options')
 parser.add_argument('-e', '--epoch', type=int, default=30, help='Number of epochs')
 parser.add_argument('-s', '--e_stop', type=bool, default=True, help='Apply early stop')
-parser.add_argument('-f', '--fine_tune', type=bool, default=True, help='Fine-tune ONLY')
+parser.add_argument('-f', '--fine_tune', type=bool, default=False, help='Fine-tune ONLY')
 parser.add_argument('-p', '--load_pretrained', type=bool, default=True, help='Load pre-trained weight')
 parser.add_argument('-c', '--comment', type=str, default="q4a", help='Run comment')
 

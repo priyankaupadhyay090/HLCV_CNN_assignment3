@@ -67,8 +67,8 @@ wandb.config.jitter = 0
 wandb.config.norm_layer = "BatchNorm"
 wandb.config.data_augment = 1
 wandb.config.early_stop = "early stopping" if args.e_stop else "w/o early stopping"
-wandb.config.fine_tune = "classifier only" if args.fine_tune else "all params"
-wandb.config.pretrained = "use pretrained weights" if args.load_pretrained else "trained from scratch"
+wandb.config.fine_tune = "all params" if not args.fine_tune else "classifier only"
+wandb.config.pretrained = "trained from scratch" if not args.load_pretrained else "use pretrained weights"
 
 data_aug_transforms = [transforms.RandomHorizontalFlip(p=0.5)]  # , transforms.RandomGrayscale(p=0.05)]
 
